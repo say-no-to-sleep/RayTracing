@@ -1,3 +1,0 @@
-/Users/eugenezhao/Desktop/Fun/RayTracing/build/CMakeFiles/inOneWeekend.dir
-/Users/eugenezhao/Desktop/Fun/RayTracing/build/CMakeFiles/edit_cache.dir
-/Users/eugenezhao/Desktop/Fun/RayTracing/build/CMakeFiles/rebuild_cache.dir
