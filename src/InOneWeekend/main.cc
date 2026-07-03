@@ -3,8 +3,33 @@
 #include "vec3.h"
 #include "ray.h"
 
+// Simple sphere
+bool hit_sphere(const point3& center, double radius, const ray &r) {
+    // Computes C - Q, ray origin to sphere center.
+    vec3 oc = center - r.origin();
+    // a = d dot d, dot product of the ray direction with itself
+    // gives the squared length of the direction vector
+    auto a = dot(r.direction(), r.direction());
+    // b = -2d dot (C - Q)
+    auto b = -2* dot(r.direction(), oc);
+    // c = (C - Q) dot (C - Q) - r^2
+    auto c = dot(oc, oc) - radius * radius;
+    // discriminant = b^2 - 4ac
+    auto disc = b * b - 4 * a * c;
+    // discriminant has to be bigger than zero
+    return (disc >= 0);
+}
+
 // color object
 color ray_color(const ray& r) {
+    // Check if ray collides with the sphere
+    // centered at (0,0,−1) (directly in front of the camera) with radius 0.5
+    if (hit_sphere(point3(0,0,-1), 0.5, r)) {
+        // return colour Red
+        return color(1, 0, 0);
+    }
+
+
     // Get the unit direction
     vec3 unit_direction = unit_vector(r.direction());
     // get the y component of unit vector
@@ -65,7 +90,7 @@ int main() {
             auto ray_direction = pixel_center - camera_center;
             // We construct a ray from the camera center towards ray direction
             ray r(camera_center, ray_direction);
-
+            
             color pixel_color = ray_color(r);
             write_color(std::cout, pixel_color);
         }
