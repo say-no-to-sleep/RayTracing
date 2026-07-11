@@ -4,7 +4,7 @@
 #include "ray.h"
 
 // Simple sphere
-bool hit_sphere(const point3& center, double radius, const ray &r) {
+double hit_sphere(const point3& center, double radius, const ray &r) {
     // Computes C - Q, ray origin to sphere center.
     vec3 oc = center - r.origin();
     // a = d dot d, dot product of the ray direction with itself
@@ -17,16 +17,32 @@ bool hit_sphere(const point3& center, double radius, const ray &r) {
     // discriminant = b^2 - 4ac
     auto disc = b * b - 4 * a * c;
     // discriminant has to be bigger than zero
-    return (disc >= 0);
+
+    // 
+    if (disc < 0) {
+        return -1.0;
+    } else {
+        // Return the smaller root
+        return (-b - std::sqrt(disc)) / (2.0 * a);
+    }
+
+    return disc;
 }
 
 // color object
 color ray_color(const ray& r) {
-    // Check if ray collides with the sphere
-    // centered at (0,0,−1) (directly in front of the camera) with radius 0.5
-    if (hit_sphere(point3(0,0,-1), 0.5, r)) {
-        // return colour Red
-        return color(1, 0, 0);
+    // sphere at 0, 0, -1, radius 0.5
+    auto t = hit_sphere(point3(0,0,-1), 0.5, r);
+    // Filters out:
+    // t = -1: ray missed sphere
+    // t < 0:  sphere is behind the camera (should not happen here)
+    if (t > 0.0) {
+        // r.at(t) computes the position where ray hits the sphere
+        // subtract sphere center from that point
+        // normalizes it
+        vec3 N = unit_vector(r.at(t) - vec3(0,0,-1));
+        // Normal is [-1,1], colour is [0,1], need to convert it.
+        return 0.5*color(N.x()+1, N.y()+1, N.z()+1);
     }
 
 
