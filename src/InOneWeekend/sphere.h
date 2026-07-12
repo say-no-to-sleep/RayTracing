@@ -50,8 +50,11 @@ class sphere : public hittable {
             rec.t = root;
             // point is at origin + t * direction
             rec.p = r.at(rec.t);
-            // vector pointing from the sphere center towards the point.
-            rec.normal = (rec.p - center) / radius;
+            // Calculates the outward normal
+            vec3 outward_normal = (rec.p - center) / radius;
+            // Flip normal if ray is inside->outside.
+            rec.set_face_normal(r, outward_normal);
+
 
             return true;
         }

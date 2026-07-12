@@ -12,6 +12,18 @@ class hit_record {
         vec3 normal;
         // how far along the ray it was
         double t;
+
+        // front face
+        bool front_face;
+
+        // calculates front_face and the normal vector
+        void set_face_normal(const ray& r, const vec3& outward_normal) {
+
+            // If dot is negative, ray and outward normal points towards each other, ray is hitting outside, front_face is true
+            front_face = dot(r.direction(), outward_normal) < 0;
+            // If front face is true, it's normal. If it's not (we hit from inside), we flip the normal. 
+            normal = front_face ? outward_normal : -outward_normal;
+        }
 };
 
 //  Virtual functions:
