@@ -10,12 +10,12 @@ double hit_sphere(const point3& center, double radius, const ray &r) {
     // a = d dot d, dot product of the ray direction with itself
     // gives the squared length of the direction vector
     auto a = dot(r.direction(), r.direction());
-    // b = -2d dot (C - Q)
-    auto b = -2* dot(r.direction(), oc);
+    // h = d dot (C - Q)
+    auto h = dot(r.direction(), oc);
     // c = (C - Q) dot (C - Q) - r^2
     auto c = dot(oc, oc) - radius * radius;
-    // discriminant = b^2 - 4ac
-    auto disc = b * b - 4 * a * c;
+    // discriminant = h^2 - ac
+    auto disc = h * h - a * c;
     // discriminant has to be bigger than zero
 
     // 
@@ -23,7 +23,7 @@ double hit_sphere(const point3& center, double radius, const ray &r) {
         return -1.0;
     } else {
         // Return the smaller root
-        return (-b - std::sqrt(disc)) / (2.0 * a);
+        return (h - std::sqrt(disc)) / a;
     }
 
     return disc;
