@@ -15,7 +15,7 @@ class sphere : public hittable {
         sphere(const point3& center, double radius) : center(center), radius(std::fmax(0,radius)) {}
 
         // Implements the virtual function from hittable.
-        bool hit(const ray& r, double ray_tmin, double ray_tmax, hit_record& rec) const override {
+        bool hit(const ray& r, interval ray_t, hit_record& rec) const override {
             // oc = C - Q
             vec3 oc = center - r.origin();
             // a = d dot d, dot product of the ray direction with itself
@@ -37,10 +37,10 @@ class sphere : public hittable {
             auto root = (h - sqrtd) / a;
 
             // check if the root is within the range. 
-            if (root <= ray_tmin || ray_tmax <= root) {
+            if (!ray_t.surrounds(root)) {
                 // If it is not acceptable, we try the further root
                 root = (h + sqrtd) / a;
-                if (root <= ray_tmin || ray_tmax <= root)
+                if (!ray_t.surrounds(root))
                     // the root is treated as not hit. 
                     return false;
             }

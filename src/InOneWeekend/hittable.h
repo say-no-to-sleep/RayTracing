@@ -43,8 +43,8 @@ class hittable {
         // 
         virtual bool hit(
             const ray& r, // the ray being tested. Passed by reference to avoid copying
-            double ray_tmin, // permitted interval for t
-            double ray_tmax, // intersection is valid when ray_tmin <= t, t <= ray_tmax
+            
+            interval ray_t, // intersection is valid when ray_tmin <= t, t <= ray_tmax
                                 // ray_tmin is set to small positive number. avoid treating surface that emitted a secondary ray as intersecting itself.
                                     // When calculating reflecction, the new ray should begin at the surface
                                     // However due to floating point, it can be slightly inside the surface.
