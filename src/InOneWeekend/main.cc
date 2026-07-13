@@ -1,50 +1,14 @@
-#include <iostream>
-#include "color.h"
-#include "vec3.h"
-#include "ray.h"
-
-// Simple sphere
-double hit_sphere(const point3& center, double radius, const ray &r) {
-    // Computes C - Q, ray origin to sphere center.
-    vec3 oc = center - r.origin();
-    // a = d dot d, dot product of the ray direction with itself
-    // gives the squared length of the direction vector
-    auto a = dot(r.direction(), r.direction());
-    // h = d dot (C - Q)
-    auto h = dot(r.direction(), oc);
-    // c = (C - Q) dot (C - Q) - r^2
-    auto c = dot(oc, oc) - radius * radius;
-    // discriminant = h^2 - ac
-    auto disc = h * h - a * c;
-    // discriminant has to be bigger than zero
-
-    // 
-    if (disc < 0) {
-        return -1.0;
-    } else {
-        // Return the smaller root
-        return (h - std::sqrt(disc)) / a;
-    }
-
-    return disc;
-}
+#include "rtweekend.h"
+#include "hittable.h"
+#include "hittable_list.h"
+#include "sphere.h"
 
 // color object
-color ray_color(const ray& r) {
-    // sphere at 0, 0, -1, radius 0.5
-    auto t = hit_sphere(point3(0,0,-1), 0.5, r);
-    // Filters out:
-    // t = -1: ray missed sphere
-    // t < 0:  sphere is behind the camera (should not happen here)
-    if (t > 0.0) {
-        // r.at(t) computes the position where ray hits the sphere
-        // subtract sphere center from that point
-        // normalizes it
-        vec3 N = unit_vector(r.at(t) - vec3(0,0,-1));
-        // Normal is [-1,1], colour is [0,1], need to convert it.
-        return 0.5*color(N.x()+1, N.y()+1, N.z()+1);
+color ray_color(const ray& r, const hittable& world) {
+    hit_record rec;
+    if(world.hit(r, 0, infinity, rec)) {
+        return 0.5 * (rec.normal + color(1,1,1));
     }
-
 
     // Get the unit direction
     vec3 unit_direction = unit_vector(r.direction());
@@ -58,7 +22,8 @@ color ray_color(const ray& r) {
 }
 
 int main() {
-    // Image
+    // === IMAGE ===
+
     auto aspect_ratio = 16.0 / 9.0;
     int image_width = 400;
 
@@ -66,6 +31,17 @@ int main() {
     // Ensure it is at least 1
     int image_height = int(image_width/aspect_ratio);
     image_height = (image_height < 1) ? 1 : image_height;
+
+    // === WORLD ===
+
+    hittable_list world;
+    // sphere in front of us
+    world.add(make_shared<sphere>(point3(0,0,-1), 0.5));
+    // sphere below us
+    world.add(make_shared<sphere>(point3(0,-100.5,-1), 100));
+
+
+    // === CAMERA === 
 
     // Camera settings
     auto focal_length = 1.0;
@@ -96,6 +72,8 @@ int main() {
     // move bottom right half the distance of pixel step
     auto pixel00_loc = viewport_upper_left + 0.5 * (pixel_delta_u + pixel_delta_v);
 
+    // === RENDER ===
+
     std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
         for(int j = 0; j < image_height; j++) {
         std::clog << "\rScanlines remaining: " << (image_height-j) << ' ' << std::flush; 
@@ -107,7 +85,7 @@ int main() {
             // We construct a ray from the camera center towards ray direction
             ray r(camera_center, ray_direction);
             
-            color pixel_color = ray_color(r);
+            color pixel_color = ray_color(r, world);
             write_color(std::cout, pixel_color);
         }
     }

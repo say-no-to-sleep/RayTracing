@@ -3,13 +3,11 @@
 
 #include "hittable.h"
 
-#include <memory>
 #include <vector>
 
 // allow the code to write shared_ptr<hittable> rather than std::shared_ptr<hittable>.
 // as of 6.5, we're not using make_shared yet... 
-using std::make_shared;
-using std::shared_ptr;
+// as of 6.7, we have moved them to rtweekend.h
 
 // inherits from hittable
 // Allows code to work with a single abstract object World even if it's a collection of objects

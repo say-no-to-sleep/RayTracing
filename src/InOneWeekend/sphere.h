@@ -2,7 +2,6 @@
 #define SPHERE_H
 
 #include "hittable.h"
-#include "vec3.h"
 
 // Sphere inherits from hittable. (AKA something that can be hit by a ray)
 class sphere : public hittable {

@@ -1,7 +1,6 @@
 #ifndef HITTABLE_H
 #define HITTABLE_H
 
-#include "ray.h"
 
 // stores information about where and how a ray hit something
 class hit_record {
