@@ -4,7 +4,7 @@
 #include <cmath>
 #include <iostream>
 #include <limits>
-#include <cstdlib>
+#include <random>
 #include <memory>
 
 using std::make_shared;
@@ -19,7 +19,9 @@ inline double degree_to_radians(double degree) {
 
 // returns a random real number in [0,1)
 inline double random_double() {
-    return std::rand() / (RAND_MAX + 1.0);
+    static std::uniform_real_distribution<double> distribution(0.0, 1.0);
+    static std::mt19937 generator;
+    return distribution(generator);
 }
 
 // Returns random real in [min, max)
