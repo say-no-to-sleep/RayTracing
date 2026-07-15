@@ -2,6 +2,7 @@
 #define COLOR_H
 
 #include "vec3.h"
+#include "interval.h"
 
 using color = vec3;
 
@@ -15,9 +16,10 @@ void write_color(std::ostream& out, const color& pixel_color) {
     // We use 255.999 so that when 0.99999... gets multiplied
     // It resolves to 255 instead of 254, this catches issues
     // with floating points.
-    int rbyte = int(255.999 * r);
-    int gbyte = int(255.999 * g);
-    int bbyte = int(255.999 * b);
+    static const interval intensity(0.000, 0.990);
+    int rbyte = int(255.999 * intensity.clamp(r));
+    int gbyte = int(255.999 * intensity.clamp(g));
+    int bbyte = int(255.999 * intensity.clamp(b));
 
     // Write out pixel colour components
     out << rbyte << ' ' << gbyte << ' ' << bbyte << '\n';
