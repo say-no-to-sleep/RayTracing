@@ -8,11 +8,13 @@ class sphere : public hittable {
     private:
         point3 center;
         double radius;
+        shared_ptr<material> mat;
     public:
         // constructor
         // receives a point and a radius
         // Prevent stored radius of being negative. 
-        sphere(const point3& center, double radius) : center(center), radius(std::fmax(0,radius)) {}
+        sphere(const point3& center, double radius, shared_ptr<material> mat)
+            : center(center), radius(std::fmax(0,radius)), mat(mat) {}
 
         // Implements the virtual function from hittable.
         bool hit(const ray& r, interval ray_t, hit_record& rec) const override {
@@ -53,6 +55,8 @@ class sphere : public hittable {
             vec3 outward_normal = (rec.p - center) / radius;
             // Flip normal if ray is inside->outside.
             rec.set_face_normal(r, outward_normal);
+
+            rec.mat = mat;
 
 
             return true;

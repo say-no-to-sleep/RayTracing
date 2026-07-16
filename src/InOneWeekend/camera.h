@@ -2,6 +2,7 @@
 #define CAMERA_H
 
 #include "hittable.h"
+#include "material.h"
 
 class camera {
     public:
@@ -100,8 +101,20 @@ class camera {
             hit_record rec;
 
             if (world.hit(r, interval(0.001, infinity), rec)){
-               vec3 direction = rec.normal + random_unit_vector();
-               return 0.6* ray_color(ray(rec.p, direction), depth-1, world); 
+                // empty variables, to be filled by scatter.
+                ray scattered; // new ray direction
+                color attenuation; // color
+
+                // ask material, how does this ray bounce.
+                // material fills in scattered and attenuation
+                // return true if ray bounced. false if absorbed
+                if (rec.mat->scatter(r, rec, attenuation, scattered)) {
+                    // multiply this surface's color by whatever color the bounced ray collects 
+                    // pixel color = albedo1 x albedo2 x albedo3 x ... x sky color
+                    return attenuation * ray_color(scattered, depth-1, world);
+                }
+                // this is if scatter returned false, return black.
+                return color(0,0,0);
             }
 
             vec3 unit_direction = unit_vector(r.direction());

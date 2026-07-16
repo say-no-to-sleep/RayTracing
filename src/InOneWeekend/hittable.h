@@ -1,6 +1,7 @@
 #ifndef HITTABLE_H
 #define HITTABLE_H
 
+class material;
 
 // stores information about where and how a ray hit something
 class hit_record {
@@ -9,6 +10,8 @@ class hit_record {
         point3 p;
         // surface normal vector at that point
         vec3 normal;
+        // material
+        shared_ptr<material> mat;
         // how far along the ray it was
         double t;
 
