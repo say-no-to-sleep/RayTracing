@@ -56,7 +56,7 @@ class sphere : public hittable {
             // Flip normal if ray is inside->outside.
             rec.set_face_normal(r, outward_normal);
 
-            rec.mat = mat;
+            rec.mat = mat; // redcount for shared pointer (of material_left) + 1
 
 
             return true;

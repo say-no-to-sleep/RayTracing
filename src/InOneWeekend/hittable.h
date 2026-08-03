@@ -1,6 +1,9 @@
 #ifndef HITTABLE_H
 #define HITTABLE_H
 
+// Fix for circular dependency
+// material.h includes hittable.h, hit_records wants to name material.
+// Fix is forward declaration, here, to tell the compiler that material is a class that will be defined later.
 class material;
 
 // stores information about where and how a ray hit something
