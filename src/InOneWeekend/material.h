@@ -96,11 +96,25 @@ class dielectric : public material {
 
             // We need the unit vector because refracts derived every step assuming it.
             vec3 unit_direction = unit_vector(r_in.direction());
-            // refract
-            vec3 refracted = refract(unit_direction, rec.normal, ri);
+
+            // Calculates cos theta, same as in refract function.
+            double cos_theta = std::fmin(dot(-unit_direction, rec.normal), 1.0);
+            // sin theta = sqrt(1 - cos theta squared), from trig identities.
+            double sin_theta = std::sqrt(1.0 - cos_theta*cos_theta);
+
+            // If (η/η' sin theta) is above 1, the equation has no solution, we fall back to reflect
+            bool cannot_refract = ri * sin_theta > 1.0;
+            vec3 direction;
+
+            if (cannot_refract)
+                // reflect
+                direction = reflect(unit_direction, rec.normal);
+            else
+                // refract
+                direction = refract(unit_direction, rec.normal, ri);
 
             // New ray start at hit point and goes to refracted position
-            scattered = ray(rec.p, refracted);
+            scattered = ray(rec.p, direction);
             // return unconditionally. Dielectric never swallows ray.
             return true;
         }
