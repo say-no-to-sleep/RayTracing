@@ -151,4 +151,26 @@ inline vec3 reflect(const vec3& v, const vec3& n) {
     return v - 2 * dot(v, n) * n;
 }
 
+// Refraction
+// uv -> R
+// n -> unit normal on incident side
+// etai_over_etat -> η/η'
+inline vec3 refract(const vec3& uv, const vec3& n, double etai_over_etat) {
+    // cos theta = -R * n
+    auto cos_theta = std::fmin(dot(-uv, n), 1.0); // fmin is for safety, clamp to unit vector
+    // R' (perp) = η/η' (R + cos theta (n)) 
+    vec3 r_out_perp = etai_over_etat * (uv + cos_theta * n);
+    // R' (parrallel) = -sqrt(1-|R' (perp)|^2) n
+    vec3 r_out_parallel = -std::sqrt(std::fabs(1.0 - r_out_perp.length_squared())) * n;
+        // fabs -> still clamp, stop argument from going slightly negative.
+        // length_squared rather than length. Formula wants squared, so squaring a sqrt waste compute.
+
+    // important: if total internal reflection happens, this quantity is meaningfully negative
+    // fabs will produce a plausible looking but WRONG answer
+    // Therefore the caller has to check before calling this. 
+    // If total internet reflection happened, it needs to call reflect instead.
+
+    return r_out_perp + r_out_parallel;
+}
+
 #endif

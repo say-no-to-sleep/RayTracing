@@ -74,4 +74,41 @@ class metal : public material {
         double fuzz;
 };
 
+// Dielectric material (A.K.A, glass, water, etc)
+class dielectric : public material {
+    public:
+        // material builder
+        dielectric(double refraction_index) : refraction_index(refraction_index) {}
+
+        // scatter function, same as everything before.
+        bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered)
+        const override {
+            // 1 in every channel -> nothing is absorbed.
+            // This is for clear glass. A tinted one would have slight changes to drain colours out
+            attenuation = color(1.0, 1.0, 1.0);
+            // This ratio inverts depending on which way we cross boundary
+            // Because refract takes η/η'
+            double ri = rec.front_face ? (1.0/refraction_index) : refraction_index;
+                // Entering: front_face = true, ratio is 1.0/1.5
+                // Exiting: front_face = false, ratio is just the index = 1.5/1.0
+
+            // This only works because air is assumed to be 1.0
+
+            // We need the unit vector because refracts derived every step assuming it.
+            vec3 unit_direction = unit_vector(r_in.direction());
+            // refract
+            vec3 refracted = refract(unit_direction, rec.normal, ri);
+
+            // New ray start at hit point and goes to refracted position
+            scattered = ray(rec.p, refracted);
+            // return unconditionally. Dielectric never swallows ray.
+            return true;
+        }
+
+    private:
+        // Refractive index in vacuum or air, or the ratio of the material's refractive index over
+        // the refractive index of the enclosing media
+        double refraction_index;
+};
+
 #endif
