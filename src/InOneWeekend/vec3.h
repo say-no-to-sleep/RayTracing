@@ -173,4 +173,18 @@ inline vec3 refract(const vec3& uv, const vec3& n, double etai_over_etat) {
     return r_out_perp + r_out_parallel;
 }
 
+// This is for defocus blur: Rejection Sampling
+// How to get a uniform random point inside a disk whel all we have is uniform random number for intervals
+inline vec3 random_in_unit_disk() {
+    while(true) {
+        // Random point in 2 x 2 square.
+        auto p = vec3(random_double(-1, 1), random_double(-1, 1), 0);
+        // Reject if it's not in the circle.
+        if (p.length_squared() < 1)
+            return p;
+    }
+}
+// Note, this might be wasteful... around 79% of draws succeed. 
+// For higher dimensions it fails more and more badly. In 10D, a hypersphere occupies 0.25% of the bounding cube.
+
 #endif
